@@ -64,10 +64,22 @@ GROUP BY country_id
 ORDER BY average DESC
 LIMIT 10;
 
-SELECT MAKEDATE(year_field, 1) AS table_date, 
-CURDATE() AS date_now, 
-CAST(DATEDIFF(CURDATE(), MAKEDATE(year_field, 1)) / 365 AS INT) AS years_ago
-FROM country_infections;
+ALTER TABLE country_infections DROP COLUMN old_date, DROP COLUMN new_date, DROP COLUMN years_ago;
+
+ALTER TABLE country_infections ADD COLUMN old_date DATE, ADD COLUMN new_date DATE, ADD COLUMN years_ago INT;
+
+
+UPDATE country_infections
+SET old_date = MAKEDATE(year_field, 1),
+new_date = CURDATE(),
+years_ago = CAST(DATEDIFF(CURDATE(), MAKEDATE(year_field, 1)) / 365 AS INT);
+
+SELECT old_date, new_date, years_ago FROM country_infections;
+
+-- SELECT MAKEDATE(year_field, 1) AS table_date, 
+-- CURDATE() AS date_now, 
+-- CAST(DATEDIFF(CURDATE(), MAKEDATE(year_field, 1)) / 365 AS INT) AS years_ago
+-- FROM country_infections;
 
 DROP FUNCTION IF EXISTS YEARSDIFF;
 
